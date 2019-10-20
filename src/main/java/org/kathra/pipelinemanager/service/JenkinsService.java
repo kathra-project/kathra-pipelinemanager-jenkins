@@ -283,13 +283,15 @@ public class JenkinsService {
 
     private com.offbytwo.jenkins.model.Build getLastBuild(Job jenkinsPipeline, com.offbytwo.jenkins.model.Build lastKnownBuild) throws Exception {
         int attempt = 0;
-        int maxAttempts = 20;
+        int maxAttempts = 40;
+        int waitMs = 500;
         com.offbytwo.jenkins.model.Build lastBuild = null;
         do {
             if (attempt >= maxAttempts) {
                 throw new Exception("Unable to get current build for job '" + jenkinsPipeline.getName()+"'");
-            } else if (lastBuild != null) {
-                Thread.sleep(500);
+            } else if (attempt > 0) {
+                logger.warn("Unable to get last build '" + jenkinsPipeline.getName() + "', retry in " + waitMs + "ms (attempt:" + attempt + " / maxAttempts:" + maxAttempts + ")");
+                Thread.sleep(waitMs);
             }
             lastBuild = jenkinsPipeline.details().getLastBuild();
             attempt++;
