@@ -21,7 +21,7 @@
 package org.kathra.pipelinemanager.service;
 
 public enum JenkinsTemplate {
-    JavaLibrary("JavaLibrary", "java"), JavaService("JavaService", "java"), PythonLibrary("PythonLibrary", "python"), PythonService("PythonService", "python");
+    JavaLibrary("JavaLibrary", "java"), JavaService("JavaService", "java"), PythonLibrary("PythonLibrary", "python"), PythonService("PythonService", "python"), DockerService("DockerService", "docker");
 
     public final String name;
     public final String lang;
