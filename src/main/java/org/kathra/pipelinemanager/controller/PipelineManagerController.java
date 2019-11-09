@@ -163,6 +163,7 @@ public class PipelineManagerController implements PipelineManagerService {
         return pipeline;
     }
 
+    @Override
     public String deletePipeline(String path) throws Exception {
         int attempt = 0;
         Exception lastException = null;
