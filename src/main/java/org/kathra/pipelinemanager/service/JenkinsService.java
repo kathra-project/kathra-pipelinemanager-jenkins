@@ -353,6 +353,28 @@ public class JenkinsService {
         return pipeline;
     }
 
+
+    public void deletePipeline(Pipeline pipeline) throws Exception {
+        if (pipeline == null)
+            throw new IllegalArgumentException("Pipeline argument is null");
+        String pipelinePath = pipeline.getPath();
+        try {
+            client.deleteJob(pipelinePath);
+        } catch (IOException e) {
+            throw new Exception("Unable to delete pipeline with name " + pipelinePath + " : " + e.getMessage());
+        }
+
+        // Test job deletion is OK
+        try {
+            JobWithDetails jobDeleted = client.getJob(pipelinePath);
+            if (jobDeleted != null) {
+                throw new IllegalStateException("Pipeline with path " + pipelinePath + " should be deleted, but already exists.");
+            }
+        } catch (IOException e) {
+            // job not found as excepted
+        }
+    }
+
     public static String getStringFromDocument(Document doc) throws TransformerException {
         DOMSource domSource = new DOMSource(doc);
         StringWriter writer = new StringWriter();
@@ -402,9 +424,7 @@ public class JenkinsService {
                         || (params!=null && branch.equals(params.get("GIT_BRANCH"))))
                     builds.add(map(null, jenkinsBuild));
             }
-
             return builds;
-
         } catch(IOException e) {
             e.printStackTrace();
             throw new Exception("Unable to get last build for pipeline "+path);
@@ -432,9 +452,7 @@ public class JenkinsService {
                     jenkinsPermissions.add(permissions.item(k).getTextContent());
                 }
             }
-
             memberships = permisionToMembership(jenkinsPermissions,path);
-
         }
         return memberships;
     }
@@ -653,7 +671,6 @@ public class JenkinsService {
     }
 
     private synchronized FolderJob createFolderIfNotExists(String group, FolderJob parentFolder) throws IOException, InterruptedException {
-
         int nbRetry = 0;
         FolderJob groupFolder = null;
 

@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<flow-definition plugin="workflow-job@2.9">
+    <actions/>
+    <description></description>
+    <keepDependencies>false</keepDependencies>
+    <properties>
+        <hudson.model.ParametersDefinitionProperty>
+            <parameterDefinitions>
+                <hudson.model.StringParameterDefinition>
+                    <name>GIT_URL</name>
+                    <description></description>
+                    <defaultValue>${repoUrl}</defaultValue>
+                </hudson.model.StringParameterDefinition>
+                <hudson.model.StringParameterDefinition>
+                    <name>GIT_BRANCH</name>
+                    <description></description>
+                    <defaultValue>dev</defaultValue>
+                </hudson.model.StringParameterDefinition>
+                <hudson.model.StringParameterDefinition>
+                    <name>IMAGE_NAME</name>
+                    <description></description>
+                    <defaultValue>${imageName}</defaultValue>
+                </hudson.model.StringParameterDefinition>
+                <hudson.model.StringParameterDefinition>
+                    <name>IMAGE_TAG</name>
+                    <description></description>
+                    <defaultValue>latest</defaultValue>
+                </hudson.model.StringParameterDefinition>
+                <hudson.model.StringParameterDefinition>
+                    <name>DOCKER_URL</name>
+                    <description></description>
+                    <defaultValue>${kathraBinaryRepository}</defaultValue>
+                </hudson.model.StringParameterDefinition>
+                <com.cloudbees.plugins.credentials.CredentialsParameterDefinition>
+                    <name>PULL_KEY</name>
+                    <description></description>
+                    <defaultValue>${credentialId}</defaultValue>
+                </com.cloudbees.plugins.credentials.CredentialsParameterDefinition>
+            </parameterDefinitions>
+        </hudson.model.ParametersDefinitionProperty>
+        <com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty plugin="gitlab-plugin@1.4.4">
+            <gitLabConnection>gitlab</gitLabConnection>
+        </com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty>
+        <org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+            <triggers/>
+        </org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+    </properties>
+    <definition class="org.jenkinsci.plugins.workflow.cps.CpsScmFlowDefinition" plugin="workflow-cps@2.24">
+        <scm class="hudson.plugins.git.GitSCM" plugin="git@3.0.1">
+            <configVersion>2</configVersion>
+            <userRemoteConfigs>
+                <hudson.plugins.git.UserRemoteConfig>
+                    <url>https://gitlab.com/kathra/factory/jenkins/pipeline-library.git</url>
+                    <credentialsId></credentialsId>
+                </hudson.plugins.git.UserRemoteConfig>
+            </userRemoteConfigs>
+            <branches>
+                <hudson.plugins.git.BranchSpec>
+                    <name>master</name>
+                </hudson.plugins.git.BranchSpec>
+            </branches>
+            <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+            <submoduleCfg class="list"/>
+            <extensions/>
+        </scm>
+        <scriptPath>templates/docker/buildAndPush</scriptPath>
+    </definition>
+    <triggers/>
+</flow-definition>

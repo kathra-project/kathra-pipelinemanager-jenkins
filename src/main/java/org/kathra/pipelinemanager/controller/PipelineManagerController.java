@@ -25,6 +25,7 @@ import com.offbytwo.jenkins.JenkinsServer;
 import org.kathra.core.model.Build;
 import org.kathra.core.model.Membership;
 import org.kathra.core.model.Pipeline;
+import org.kathra.core.model.Resource;
 import org.kathra.pipelinemanager.Config;
 import org.kathra.pipelinemanager.model.Credential;
 import org.kathra.pipelinemanager.service.JenkinsRestService;
@@ -160,6 +161,30 @@ public class PipelineManagerController implements PipelineManagerService {
             throw lastException;
         }
         return pipeline;
+    }
+
+    @Override
+    public String deletePipeline(String path) throws Exception {
+        int attempt = 0;
+        Exception lastException = null;
+        do {
+            try {
+                getJenkinsService().deletePipeline(new Pipeline().path(path));
+                lastException = null;
+                break;
+            } catch (Exception e) {
+                long wait = (long) (attemptWaitMs * Math.pow(2, attempt));
+                logger.warn("Unable to create pipeline " + path + ", wait  " + wait + " ms and retry (" + attempt + "/" + maxAttempt + ")");
+                lastException = e;
+                Thread.sleep(wait);
+                attempt++;
+            }
+        } while(attempt < maxAttempt);
+        if (lastException != null) {
+            lastException.printStackTrace();
+            throw lastException;
+        }
+        return "OK";
     }
 
     @Override

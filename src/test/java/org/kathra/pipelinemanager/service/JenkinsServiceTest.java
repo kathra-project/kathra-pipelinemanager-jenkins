@@ -993,4 +993,31 @@ class JenkinsServiceTest {
     }
 
 
+
+    /**
+     * Check delete creation
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    @Test
+    public void given_nominal_args_folder_when_deletePipeline_then_works() throws Exception {
+        underTest.deletePipeline(new Pipeline().path(ARTIFACT_ID_PATH));
+        verify(client).deleteJob(Mockito.eq(ARTIFACT_ID_PATH));
+    }
+
+    /**
+     * Check delete creation with error
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    @Test
+    public void given_nominal_args_folder_when_deletePipeline_then_throw_exception() throws Exception {
+        Mockito.doAnswer(invocationOnMock -> {
+            Mockito.when(client.getJob(ARTIFACT_ID_PATH)).thenReturn(Mockito.mock(JobWithDetails.class));
+            return null;
+        }).when(client).deleteJob(Mockito.eq(ARTIFACT_ID_PATH));
+        assertThrows(IllegalStateException.class,()-> {
+            underTest.deletePipeline(new Pipeline().path(ARTIFACT_ID_PATH));;
+        });
+    }
 }

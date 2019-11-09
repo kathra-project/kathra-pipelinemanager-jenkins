@@ -23,6 +23,7 @@ package org.kathra.pipelinemanager.controller;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.offbytwo.jenkins.JenkinsServer;
+import org.hamcrest.Matchers;
 import org.kathra.core.model.*;
 
 import org.kathra.pipelinemanager.model.Credential;
@@ -34,6 +35,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -48,6 +50,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 /**
  * Test class {@linkplain JenkinsService}
@@ -282,6 +285,13 @@ class PipelineManagerControllerTest {
     public void given_valid_folder_name_when_createFolder_then_works() throws Exception{
             Mockito.when(jenkinsService.createFolder("folderName")).thenReturn(true);
             underTest.createFolder("folderName");
+    }
 
+    @Test
+    public void given_valid_folder_name_when_deletePipeline_then_works() throws Exception{
+        underTest.deletePipeline("folderName");
+        ArgumentCaptor<Pipeline> argument = ArgumentCaptor.forClass(Pipeline.class);
+        verify(jenkinsService).deletePipeline(argument.capture());
+        assertEquals("folderName",argument.getValue().getPath());
     }
 }
