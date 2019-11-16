@@ -995,27 +995,52 @@ class JenkinsServiceTest {
 
 
     /**
-     * Check delete creation
+     * Check delete
      * @throws IOException
      * @throws InterruptedException
      */
     @Test
     public void given_nominal_args_folder_when_deletePipeline_then_works() throws Exception {
+        JobWithDetails job = Mockito.mock(JobWithDetails.class);
+        FolderJob folderJob = Mockito.mock(FolderJob.class);
+        Mockito.when(client.getJob(GROUP)).thenReturn(job);
+        Mockito.when(client.getFolderJob(job)).thenReturn(Optional.of(folderJob));
         underTest.deletePipeline(new Pipeline().path(ARTIFACT_ID_PATH));
-        verify(client).deleteJob(Mockito.eq(ARTIFACT_ID_PATH));
+        verify(client).deleteJob(folderJob, ARTIFACT_ID, true);
     }
 
     /**
-     * Check delete creation with error
+     * Check delete with error
      * @throws IOException
      * @throws InterruptedException
      */
     @Test
-    public void given_nominal_args_folder_when_deletePipeline_then_throw_exception() throws Exception {
+    public void given_pipeline_with_deleting_error_when_deletePipeline_then_throw_exception() throws Exception {
+        JobWithDetails job = Mockito.mock(JobWithDetails.class);
+        FolderJob folderJob = Mockito.mock(FolderJob.class);
+        Mockito.when(client.getJob(GROUP)).thenReturn(job);
+        Mockito.when(client.getFolderJob(job)).thenReturn(Optional.of(folderJob));
+        Mockito.doThrow(new IOException()).when(client).deleteJob(folderJob, ARTIFACT_ID, true);
+        assertThrows(Exception.class,()-> {
+            underTest.deletePipeline(new Pipeline().path(ARTIFACT_ID_PATH));;
+        });
+    }
+
+    /**
+     * Check delete with error
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    @Test
+    public void given_pipeline_no_deletable_when_deletePipeline_then_throw_exception() throws Exception {
+        JobWithDetails job = Mockito.mock(JobWithDetails.class);
+        FolderJob folderJob = Mockito.mock(FolderJob.class);
+        Mockito.when(client.getJob(GROUP)).thenReturn(job);
+        Mockito.when(client.getFolderJob(job)).thenReturn(Optional.of(folderJob));
         Mockito.doAnswer(invocationOnMock -> {
             Mockito.when(client.getJob(ARTIFACT_ID_PATH)).thenReturn(Mockito.mock(JobWithDetails.class));
             return null;
-        }).when(client).deleteJob(Mockito.eq(ARTIFACT_ID_PATH));
+        }).when(client).deleteJob(folderJob, ARTIFACT_ID, true);
         assertThrows(IllegalStateException.class,()-> {
             underTest.deletePipeline(new Pipeline().path(ARTIFACT_ID_PATH));;
         });

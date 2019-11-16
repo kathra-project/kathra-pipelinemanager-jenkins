@@ -359,7 +359,11 @@ public class JenkinsService {
             throw new IllegalArgumentException("Pipeline argument is null");
         String pipelinePath = pipeline.getPath();
         try {
-            client.deleteJob(pipelinePath);
+            String folderPath = pipelinePath.substring(0, pipeline.getPath().lastIndexOf("/"));
+            String pipelineName = pipelinePath.substring(pipeline.getPath().lastIndexOf("/")+1);
+            Job job = client.getJob(folderPath);
+            FolderJob folderJob = client.getFolderJob(job).get();
+            client.deleteJob(folderJob, pipelineName, true);
         } catch (IOException e) {
             throw new Exception("Unable to delete pipeline with name " + pipelinePath + " : " + e.getMessage());
         }
