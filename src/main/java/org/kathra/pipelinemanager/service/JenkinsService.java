@@ -24,6 +24,7 @@ import com.google.common.base.Optional;
 import com.mashape.unirest.http.HttpResponse;
 import com.offbytwo.jenkins.JenkinsServer;
 import com.offbytwo.jenkins.model.*;
+import jdk.nashorn.internal.ir.annotations.Immutable;
 import org.kathra.core.model.Build;
 import org.kathra.core.model.*;
 import org.kathra.pipelinemanager.Config;
@@ -310,6 +311,10 @@ public class JenkinsService {
         if (pipeline == null)
             throw new IllegalArgumentException("Pipeline argument is null");
 
+        Map<String, String> templateValues = new HashMap<String, String>();
+        templateValues.putAll(pipeline.getMetadata());
+        templateValues.put("repoUrl", repositoryUrl);
+        templateValues.put("credentialId", pipeline.getCredentialId());
         String pipelinePath = pipeline.getPath();
         String repositoryUrl = pipeline.getSourceRepository()==null?StringUtils.EMPTY:pipeline.getSourceRepository().getSshUrl();
         Pipeline.TemplateEnum pipelineTemplate = pipeline.getTemplate();
@@ -336,7 +341,7 @@ public class JenkinsService {
         if (existingJob != null) {
             throw new IllegalStateException("Pipeline with name '" + pipelineName + "' is already existing in folder : '" + folderPath + "'");
         }
-        client.createJob(groupFolder, pipelineName, getTemplateXML(map(pipelineTemplate), repositoryUrl, pipeline.getCredentialId()));
+        client.createJob(groupFolder, pipelineName, getTemplateXML(map(pipelineTemplate), templateValues));
 
         // Test job creation is OK
         JobWithDetails jobCreated = client.getJob(groupFolder, pipelineName);
@@ -492,7 +497,18 @@ public class JenkinsService {
      * @return
      */
     public String getTemplateXML(JenkinsTemplate template, String repositoryURL, String credentialId) {
-        return templates.get(template).replace("${repoUrl}", repositoryURL).replace("${credentialId}", credentialId);
+        Map<String, String> values = new HashMap();
+        values.put("repoUrl", repositoryURL);;
+        values.put("credentialId", credentialId);
+        return getTemplateXML(template, values);
+    }
+
+    public String getTemplateXML(JenkinsTemplate template, Map<String,String> values) {
+        String templateAsStr = templates.get(template);
+        for (Map.Entry<String,String> entry : values.entrySet()) {
+            templateAsStr = templateAsStr.replace("${"+entry.getKey()+"}", entry.getValue());
+        }
+        return templateAsStr;
     }
 
 
