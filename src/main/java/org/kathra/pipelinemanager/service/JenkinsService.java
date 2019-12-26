@@ -20,11 +20,9 @@
  */
 package org.kathra.pipelinemanager.service;
 
-import com.google.common.base.Optional;
 import com.mashape.unirest.http.HttpResponse;
 import com.offbytwo.jenkins.JenkinsServer;
 import com.offbytwo.jenkins.model.*;
-import jdk.nashorn.internal.ir.annotations.Immutable;
 import org.kathra.core.model.Build;
 import org.kathra.core.model.*;
 import org.kathra.pipelinemanager.Config;
@@ -86,10 +84,6 @@ public class JenkinsService {
 
     private Config config;
 
-
-
-    // private static List<String> subRepositories = ImmutableList.of("interface", "model", "client");
-    // private static List<String> templateList = Arrays.asList("JavaLibrary", "JavaService", "PythonLibrary", "PythonService");
 
     public JenkinsService(Config config) throws Exception {
         client = new JenkinsServer(new URI(config.getJenkinsUrl()), config.getJenkinsAccountName(), config.getJenkinsAccountApiToken());
@@ -315,8 +309,10 @@ public class JenkinsService {
         String repositoryUrl = pipeline.getSourceRepository()==null?StringUtils.EMPTY:pipeline.getSourceRepository().getSshUrl();
         Pipeline.TemplateEnum pipelineTemplate = pipeline.getTemplate();
 
-        Map<String, String> templateValues = new HashMap<String, String>();
-        templateValues.putAll(pipeline.getMetadata());
+        Map<String, Object> templateValues = new HashMap<>();
+        if (pipeline.getMetadata() != null) {
+            templateValues.putAll(pipeline.getMetadata());
+        }
         templateValues.put("repoUrl", repositoryUrl);
         templateValues.put("credentialId", pipeline.getCredentialId());
         
@@ -498,16 +494,16 @@ public class JenkinsService {
      * @return
      */
     public String getTemplateXML(JenkinsTemplate template, String repositoryURL, String credentialId) {
-        Map<String, String> values = new HashMap();
+        Map<String, Object> values = new HashMap();
         values.put("repoUrl", repositoryURL);;
         values.put("credentialId", credentialId);
         return getTemplateXML(template, values);
     }
 
-    public String getTemplateXML(JenkinsTemplate template, Map<String,String> values) {
+    public String getTemplateXML(JenkinsTemplate template, Map<String,Object> values) {
         String templateAsStr = templates.get(template);
-        for (Map.Entry<String,String> entry : values.entrySet()) {
-            templateAsStr = templateAsStr.replace("${"+entry.getKey()+"}", entry.getValue());
+        for (Map.Entry<String,Object> entry : values.entrySet()) {
+            templateAsStr = templateAsStr.replace("${"+entry.getKey()+"}", entry.getValue().toString());
         }
         return templateAsStr;
     }
