@@ -311,14 +311,15 @@ public class JenkinsService {
         if (pipeline == null)
             throw new IllegalArgumentException("Pipeline argument is null");
 
-        Map<String, String> templateValues = new HashMap<String, String>();
-        templateValues.putAll(pipeline.getMetadata());
-        templateValues.put("repoUrl", repositoryUrl);
-        templateValues.put("credentialId", pipeline.getCredentialId());
         String pipelinePath = pipeline.getPath();
         String repositoryUrl = pipeline.getSourceRepository()==null?StringUtils.EMPTY:pipeline.getSourceRepository().getSshUrl();
         Pipeline.TemplateEnum pipelineTemplate = pipeline.getTemplate();
 
+        Map<String, String> templateValues = new HashMap<String, String>();
+        templateValues.putAll(pipeline.getMetadata());
+        templateValues.put("repoUrl", repositoryUrl);
+        templateValues.put("credentialId", pipeline.getCredentialId());
+        
         logger.info(
                 "create pipeline : " +
                         "path:" + pipelinePath
