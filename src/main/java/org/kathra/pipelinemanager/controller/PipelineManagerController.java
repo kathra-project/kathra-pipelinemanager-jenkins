@@ -31,7 +31,7 @@ import org.kathra.core.model.Pipeline;
 import org.kathra.pipelinemanager.Config;
 import org.kathra.pipelinemanager.model.Credential;
 import org.kathra.pipelinemanager.service.JenkinsService;
-import org.kathra.pipelinemanager.service.PipelinemanagerService;
+import org.kathra.pipelinemanager.service.PipelineManagerService;
 import org.kathra.utils.ApiException;
 import org.kathra.utils.KathraException;
 
@@ -43,7 +43,7 @@ import java.util.List;
  */
 @Named("PipelineManagerController")
 @ContextName("PipelineManager")
-public class PipelineManagerController implements PipelinemanagerService {
+public class PipelineManagerController implements PipelineManagerService {
 
 
     private int maxAttempt = 5;
