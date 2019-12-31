@@ -17,19 +17,19 @@
                     <defaultValue>dev</defaultValue>
                 </hudson.model.StringParameterDefinition>
                 <hudson.model.StringParameterDefinition>
-                    <name>CHART_MUSEUM_URL</name>
+                    <name>BINARY_REPOSITORY_URL</name>
                     <description></description>
-                    <defaultValue>${CHART_MUSEUM_URL}</defaultValue>
+                    <defaultValue>${BINARY_REPOSITORY_URL}</defaultValue>
                 </hudson.model.StringParameterDefinition>
                 <hudson.model.StringParameterDefinition>
-                    <name>CHART_MUSEUM_USERNAME</name>
+                    <name>BINARY_REPOSITORY_USERNAME</name>
                     <description></description>
-                    <defaultValue>${CHART_MUSEUM_USERNAME}</defaultValue>
+                    <defaultValue>${BINARY_REPOSITORY_USERNAME}</defaultValue>
                 </hudson.model.StringParameterDefinition>
                 <hudson.model.StringParameterDefinition>
-                    <name>CHART_MUSEUM_PASSWORD</name>
+                    <name>BINARY_REPOSITORY_PASSWORD</name>
                     <description></description>
-                    <defaultValue>${CHART_MUSEUM_PASSWORD}</defaultValue>
+                    <defaultValue>${BINARY_REPOSITORY_PASSWORD}</defaultValue>
                 </hudson.model.StringParameterDefinition>
                 <com.cloudbees.plugins.credentials.CredentialsParameterDefinition>
                     <name>PULL_KEY</name>
