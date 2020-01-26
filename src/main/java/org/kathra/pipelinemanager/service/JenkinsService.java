@@ -657,6 +657,14 @@ public class JenkinsService {
             case PYTHON_SERVICE:
                 ret = JenkinsTemplate.PythonService;
                 break;
+            case HELM_PACKAGE:
+                ret = JenkinsTemplate.HelmChart;
+                break;
+            case DOCKER_SERVICE:
+                ret = JenkinsTemplate.DockerService;
+                break;
+            default:
+                throw new IllegalArgumentException("PipelineTemplate "+pipelineTemplate.getValue()+" not implemented");
         }
         return ret;
     }

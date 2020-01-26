@@ -26,16 +26,21 @@
                     <description></description>
                     <defaultValue>${BINARY_REPOSITORY_USERNAME}</defaultValue>
                 </hudson.model.StringParameterDefinition>
-                <hudson.model.StringParameterDefinition>
+                <hudson.model.PasswordParameterDefinition>
                     <name>BINARY_REPOSITORY_PASSWORD</name>
                     <description></description>
                     <defaultValue>${BINARY_REPOSITORY_PASSWORD}</defaultValue>
-                </hudson.model.StringParameterDefinition>
+                </hudson.model.PasswordParameterDefinition>
                 <com.cloudbees.plugins.credentials.CredentialsParameterDefinition>
                     <name>PULL_KEY</name>
                     <description></description>
                     <defaultValue>${credentialId}</defaultValue>
                 </com.cloudbees.plugins.credentials.CredentialsParameterDefinition>
+                <hudson.model.StringParameterDefinition>
+                    <name>KATHRA_WEBHOOK_URL</name>
+                    <description></description>
+                    <defaultValue>${KATHRA_WEBHOOK_URL}</defaultValue>
+                </hudson.model.StringParameterDefinition>
             </parameterDefinitions>
         </hudson.model.ParametersDefinitionProperty>
         <com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty plugin="gitlab-plugin@1.4.4">
