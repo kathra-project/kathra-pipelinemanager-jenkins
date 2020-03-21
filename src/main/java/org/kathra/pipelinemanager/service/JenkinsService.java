@@ -20,7 +20,6 @@
  */
 package org.kathra.pipelinemanager.service;
 
-import com.google.common.base.Optional;
 import com.mashape.unirest.http.HttpResponse;
 import com.offbytwo.jenkins.JenkinsServer;
 import com.offbytwo.jenkins.model.*;
@@ -85,10 +84,6 @@ public class JenkinsService {
 
     private Config config;
 
-
-
-    // private static List<String> subRepositories = ImmutableList.of("interface", "model", "client");
-    // private static List<String> templateList = Arrays.asList("JavaLibrary", "JavaService", "PythonLibrary", "PythonService");
 
     public JenkinsService(Config config) throws Exception {
         client = new JenkinsServer(new URI(config.getJenkinsUrl()), config.getJenkinsAccountName(), config.getJenkinsAccountApiToken());
@@ -314,6 +309,13 @@ public class JenkinsService {
         String repositoryUrl = pipeline.getSourceRepository()==null?StringUtils.EMPTY:pipeline.getSourceRepository().getSshUrl();
         Pipeline.TemplateEnum pipelineTemplate = pipeline.getTemplate();
 
+        Map<String, Object> templateValues = new HashMap<>();
+        if (pipeline.getMetadata() != null) {
+            templateValues.putAll(pipeline.getMetadata());
+        }
+        templateValues.put("repoUrl", repositoryUrl);
+        templateValues.put("credentialId", pipeline.getCredentialId());
+        
         logger.info(
                 "create pipeline : " +
                         "path:" + pipelinePath
@@ -336,7 +338,7 @@ public class JenkinsService {
         if (existingJob != null) {
             throw new IllegalStateException("Pipeline with name '" + pipelineName + "' is already existing in folder : '" + folderPath + "'");
         }
-        client.createJob(groupFolder, pipelineName, getTemplateXML(map(pipelineTemplate), repositoryUrl, pipeline.getCredentialId()));
+        client.createJob(groupFolder, pipelineName, getTemplateXML(map(pipelineTemplate), templateValues));
 
         // Test job creation is OK
         JobWithDetails jobCreated = client.getJob(groupFolder, pipelineName);
@@ -492,7 +494,18 @@ public class JenkinsService {
      * @return
      */
     public String getTemplateXML(JenkinsTemplate template, String repositoryURL, String credentialId) {
-        return templates.get(template).replace("${repoUrl}", repositoryURL).replace("${credentialId}", credentialId);
+        Map<String, Object> values = new HashMap();
+        values.put("repoUrl", repositoryURL);;
+        values.put("credentialId", credentialId);
+        return getTemplateXML(template, values);
+    }
+
+    public String getTemplateXML(JenkinsTemplate template, Map<String,Object> values) {
+        String templateAsStr = templates.get(template);
+        for (Map.Entry<String,Object> entry : values.entrySet()) {
+            templateAsStr = templateAsStr.replace("${"+entry.getKey()+"}", entry.getValue().toString());
+        }
+        return templateAsStr;
     }
 
 
@@ -644,6 +657,14 @@ public class JenkinsService {
             case PYTHON_SERVICE:
                 ret = JenkinsTemplate.PythonService;
                 break;
+            case HELM_PACKAGE:
+                ret = JenkinsTemplate.HelmChart;
+                break;
+            case DOCKER_SERVICE:
+                ret = JenkinsTemplate.DockerService;
+                break;
+            default:
+                throw new IllegalArgumentException("PipelineTemplate "+pipelineTemplate.getValue()+" not implemented");
         }
         return ret;
     }

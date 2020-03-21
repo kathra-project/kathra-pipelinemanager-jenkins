@@ -21,25 +21,21 @@
 
 package org.kathra.pipelinemanager.controller;
 
-import com.offbytwo.jenkins.JenkinsServer;
-import org.kathra.core.model.Build;
-import org.kathra.core.model.Membership;
-import org.kathra.core.model.Pipeline;
-import org.kathra.core.model.Resource;
-import org.kathra.pipelinemanager.Config;
-import org.kathra.pipelinemanager.model.Credential;
-import org.kathra.pipelinemanager.service.JenkinsRestService;
-import org.kathra.pipelinemanager.service.JenkinsService;
-import org.kathra.pipelinemanager.service.PipelineManagerService;
-import org.kathra.utils.ApiException;
-import org.kathra.utils.KathraException;
 import javassist.NotFoundException;
 import org.apache.camel.cdi.ContextName;
 import org.apache.http.HttpStatus;
 import org.apache.log4j.Logger;
+import org.kathra.core.model.Build;
+import org.kathra.core.model.Membership;
+import org.kathra.core.model.Pipeline;
+import org.kathra.pipelinemanager.Config;
+import org.kathra.pipelinemanager.model.Credential;
+import org.kathra.pipelinemanager.service.JenkinsService;
+import org.kathra.pipelinemanager.service.PipelineManagerService;
+import org.kathra.utils.ApiException;
+import org.kathra.utils.KathraException;
 
 import javax.inject.Named;
-import java.net.URI;
 import java.util.List;
 
 /**
