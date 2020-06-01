@@ -138,7 +138,7 @@ public class PipelineManagerController implements PipelineManagerService {
     @Override
     public Pipeline createPipeline(Pipeline pipeline) throws Exception {
         int attempt = 0;
-        Exception lastException = null;
+        Exception lastException;
         do {
             try {
                 pipeline = getJenkinsService().createPipeline(pipeline);
@@ -162,7 +162,7 @@ public class PipelineManagerController implements PipelineManagerService {
     @Override
     public String deletePipeline(String path) throws Exception {
         int attempt = 0;
-        Exception lastException = null;
+        Exception lastException;
         do {
             try {
                 getJenkinsService().deletePipeline(new Pipeline().path(path));

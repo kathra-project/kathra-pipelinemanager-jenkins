@@ -36,9 +36,9 @@ public class Config extends ConfigManager {
     private String jenkinsUrl;
 
     public Config() {
-        jenkinsAccountName = getProperty("JENKINS_ACCOUNT_NAME","kathra-pipelinemanager");
+        jenkinsAccountName = getProperty("JENKINS_ACCOUNT_NAME");
         jenkinsAccountApiToken = getProperty("JENKINS_ACCOUNT_API_TOKEN");
-        jenkinsUrl = getProperty("JENKINS_URL","https://jenkins.kathra.org");
+        jenkinsUrl = getProperty("JENKINS_URL");
     }
 
     public String getJenkinsAccountName() {
