@@ -1,5 +1,5 @@
-/* 
- * Copyright 2019 The Kathra Authors.
+/*
+ * Copyright (c) 2020. The Kathra Authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,7 @@
  * limitations under the License.
  *
  * Contributors:
- *
- *    IRT SystemX (https://www.kathra.org/)    
+ *    IRT SystemX (https://www.kathra.org/)
  *
  */
 package org.kathra.pipelinemanager.service;
@@ -34,6 +33,7 @@ import org.kathra.core.model.Pipeline;
 import org.kathra.core.model.SourceRepository;
 import org.kathra.pipelinemanager.Config;
 import org.kathra.pipelinemanager.model.Credential;
+import org.kathra.utils.KathraException;
 import org.kathra.utils.Session;
 import javassist.NotFoundException;
 import org.hamcrest.Matcher;
@@ -58,9 +58,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mockitoSession;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -211,31 +209,32 @@ class JenkinsServiceTest {
     }
 
     /**
-     * When create job existing when createPipeline throws IllegalStateException
+     * When create job existing when createPipeline return pipeline
      */
     @Test
-    public void given_nominal_args_with_existing_job_when_createPipeline_then_throws_IllegalStateException() {
-        assertThrows(IllegalStateException.class,()->
-        {
-            // Mock create folder
-            mockFolderCreation();
-            // Mock create job
-            mockJobCreation();
+    public void given_nominal_args_with_existing_job_when_createPipeline_then_return_pipeline_Ready() throws Exception {
+        // Mock create folder
+        mockFolderCreation();
+        // Mock create job
+        mockJobCreation();
 
-            FolderJob group1Folder = mockFolderExisting("MY-GROUP1", null);
-            FolderJob group2Folder = mockFolderExisting("my-group2", group1Folder);
+        FolderJob group1Folder = mockFolderExisting("MY-GROUP1", null);
+        FolderJob group2Folder = mockFolderExisting("my-group2", group1Folder);
 
-            mockJob(ARTIFACT_ID, group2Folder);
+        mockJob(ARTIFACT_ID, group2Folder);
 
-            underTest.createPipeline(new Pipeline().path(GROUP+"/"+ARTIFACT_ID).template(Pipeline.TemplateEnum.JAVA_LIBRARY).sourceRepository(new SourceRepository().sshUrl(REPOSITORY)));
+        Pipeline pipeline = new Pipeline().path(GROUP + "/" + ARTIFACT_ID).template(Pipeline.TemplateEnum.JAVA_LIBRARY).sourceRepository(new SourceRepository().sshUrl(REPOSITORY));
+        Pipeline pipelineReturned = underTest.createPipeline(pipeline);
 
-            // Verify folder creation
-            verifyFolderCreation("MY-GROUP1", null, 0 );
-            verifyFolderCreation("my-group2", "MY-GROUP1", 0);
+        // Verify folder creation
+        verifyFolderCreation("MY-GROUP1", null, 0 );
+        verifyFolderCreation("my-group2", "MY-GROUP1", 0);
 
-            // Verify job creation
-            verifyJobCreation(ARTIFACT_ID, "my-group2", 0);
-        });
+        // Verify job creation
+        verifyJobCreation(ARTIFACT_ID, "my-group2", 0);
+
+        assertEquals(pipeline, pipelineReturned);
+
     }
 
     /**

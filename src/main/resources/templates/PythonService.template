@@ -19,7 +19,7 @@
                 <hudson.model.StringParameterDefinition>
                     <name>DOCKER_URL</name>
                     <description></description>
-                    <defaultValue>registry.hub.docker.com</defaultValue>
+                    <defaultValue>${dockerBinaryRepositoryHost}</defaultValue>
                 </hudson.model.StringParameterDefinition>
                 <com.cloudbees.plugins.credentials.CredentialsParameterDefinition>
                     <name>PULL_KEY</name>
@@ -51,7 +51,7 @@
             </userRemoteConfigs>
             <branches>
                 <hudson.plugins.git.BranchSpec>
-                    <name>master</name>
+                    <name>feature/factory_tf</name>
                 </hudson.plugins.git.BranchSpec>
             </branches>
             <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
