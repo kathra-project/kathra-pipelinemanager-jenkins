@@ -1,5 +1,5 @@
-/* 
- * Copyright 2019 The Kathra Authors.
+/*
+ * Copyright (c) 2020. The Kathra Authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,7 @@
  * limitations under the License.
  *
  * Contributors:
- *
- *    IRT SystemX (https://www.kathra.org/)    
+ *    IRT SystemX (https://www.kathra.org/)
  *
  */
 
@@ -138,7 +137,7 @@ public class PipelineManagerController implements PipelineManagerService {
     @Override
     public Pipeline createPipeline(Pipeline pipeline) throws Exception {
         int attempt = 0;
-        Exception lastException = null;
+        Exception lastException;
         do {
             try {
                 pipeline = getJenkinsService().createPipeline(pipeline);
@@ -162,7 +161,7 @@ public class PipelineManagerController implements PipelineManagerService {
     @Override
     public String deletePipeline(String path) throws Exception {
         int attempt = 0;
-        Exception lastException = null;
+        Exception lastException;
         do {
             try {
                 getJenkinsService().deletePipeline(new Pipeline().path(path));

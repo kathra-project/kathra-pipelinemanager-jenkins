@@ -1,5 +1,5 @@
-/* 
- * Copyright 2019 The Kathra Authors.
+/*
+ * Copyright (c) 2020. The Kathra Authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,12 @@
  * limitations under the License.
  *
  * Contributors:
- *
- *    IRT SystemX (https://www.kathra.org/)    
+ *    IRT SystemX (https://www.kathra.org/)
  *
  */
 package org.kathra.pipelinemanager.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mashape.unirest.http.HttpResponse;
 import com.offbytwo.jenkins.JenkinsServer;
 import com.offbytwo.jenkins.model.*;
@@ -27,6 +27,8 @@ import org.kathra.core.model.Build;
 import org.kathra.core.model.*;
 import org.kathra.pipelinemanager.Config;
 import org.kathra.pipelinemanager.model.Credential;
+import org.kathra.utils.ApiException;
+import org.kathra.utils.KathraException;
 import org.kathra.utils.sanitizing.SanitizeUtils;
 import javassist.NotFoundException;
 import org.apache.commons.io.IOUtils;
@@ -307,6 +309,8 @@ public class JenkinsService {
 
         String pipelinePath = pipeline.getPath();
         String repositoryUrl = pipeline.getSourceRepository()==null?StringUtils.EMPTY:pipeline.getSourceRepository().getSshUrl();
+        if (pipeline.getTemplate() == null)
+            throw new IllegalArgumentException("Pipeline template is null");
         Pipeline.TemplateEnum pipelineTemplate = pipeline.getTemplate();
 
         Map<String, Object> templateValues = new HashMap<>();
@@ -315,12 +319,23 @@ public class JenkinsService {
         }
         templateValues.put("repoUrl", repositoryUrl);
         templateValues.put("credentialId", pipeline.getCredentialId());
-        
+
+        switch (pipelineTemplate) {
+            case PYTHON_SERVICE:
+            case JAVA_SERVICE:
+            case DOCKER_SERVICE:
+                if (!templateValues.containsKey("dockerBinaryRepositoryHost") || templateValues.get("dockerBinaryRepositoryHost").toString().isEmpty()) {
+                    throw new IllegalArgumentException("Pipeline argument 'dockerBinaryRepositoryHost' is null or empty");
+                }
+        }
+
+
         logger.info(
                 "create pipeline : " +
                         "path:" + pipelinePath
                         +", repository:"+ repositoryUrl
-                        +", pipelineTemplate:" + pipelineTemplate);
+                        +", pipelineTemplate:" + pipelineTemplate
+                        +", templateValues:" + new ObjectMapper().writeValueAsString(templateValues));
 
         if (StringUtils.isEmpty(pipelinePath) || StringUtils.isEmpty(repositoryUrl)    || pipelineTemplate == null ) {
             throw new IllegalArgumentException("1 or more arguments is null or empty");
@@ -336,8 +351,13 @@ public class JenkinsService {
         // Job
         JobWithDetails existingJob = client.getJob(groupFolder, pipelineName);
         if (existingJob != null) {
-            throw new IllegalStateException("Pipeline with name '" + pipelineName + "' is already existing in folder : '" + folderPath + "'");
+            logger.info("Pipeline with name '" + pipelineName + "' is already existing in folder : '" + folderPath + "'");
+            pipeline.providerId(String.join("/", folders)+"/" + pipelineName)
+                    .status(Resource.StatusEnum.READY)
+                    .provider(PROVIDER_NAME);
+            return pipeline;
         }
+
         client.createJob(groupFolder, pipelineName, getTemplateXML(map(pipelineTemplate), templateValues));
 
         // Test job creation is OK
